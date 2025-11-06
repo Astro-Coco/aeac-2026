@@ -1,0 +1,17 @@
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile.dev
+    container_name: water
+    network_mode: host
+    tty: true
+    stdin_open: true
+    volumes:
+      - ../workspaces/water_ws:/water_ws
+      - ../packages/nav_stack:/water_ws/src/nav_stack
+      - ../packages/UI:/water_ws/src/UI
+      - ../packages/tools:/water_ws/src/tools
+      - ../packages/custom_interfaces:/water_ws/src/custom_interfaces
+    working_dir: /water_ws     # set WS in .env, e.g. workspaces/water_ws
+    command: ["bash","-lc","while :; do sleep 86400; done"]
