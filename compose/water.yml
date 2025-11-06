@@ -3,7 +3,7 @@ services:
     build:
       context: ..
       dockerfile: docker/dockerfile.dev
-    container_name: water
+    container_name: aeac-${C}
     network_mode: host
     tty: true
     stdin_open: true

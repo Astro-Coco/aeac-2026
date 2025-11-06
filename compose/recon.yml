@@ -3,7 +3,7 @@ services:
     build:
       context: ..
       dockerfile: docker/dockerfile.dev
-    container_name: recon
+    container_name: aeac-${C}
     network_mode: host
     tty: true
     stdin_open: true
@@ -13,5 +13,5 @@ services:
       - ../packages/UI:/recon_ws/src/UI
       - ../packages/tools:/recon_ws/src/tools
       - ../packages/custom_interfaces:/recon_ws/src/custom_interfaces
-    working_dir: /recon_ws     # set WS in .env, e.g. workspaces/recon_ws
+    working_dir: /recon_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
