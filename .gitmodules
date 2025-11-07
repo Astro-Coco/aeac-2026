@@ -12,4 +12,5 @@
 	url = https://github.com/Astro-Coco/nav_stack
 [submodule "packages/bringup"]
 	path = packages/bringup
-	url = https://github.com/Astro-Coco/bringup
+	url = https://github.com/Astro-Coco/bringup.git
+	branch = main
