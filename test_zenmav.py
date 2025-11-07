@@ -1,3 +1,3 @@
 from zenmav.core import *
 
-drone = Zenmav('tcp:127.0.0.1:5764')
+drone = Zenmav('tcp:127.0.0.1:5762')

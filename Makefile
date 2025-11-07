@@ -59,7 +59,7 @@ down: ## Down for C (remove orphans)
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) down --remove-orphans
 
 shell sh bash: ## Open bash in the running container (with ROS sourced)
-	docker exec -it $(CONTAINER) bash -lc "source /opt/ros/humble/setup.bash && exec bash -i"
+	docker exec -it $(CONTAINER) bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && exec bash -i"
 
 # ===== Workspace helpers =====
 link: 
@@ -80,6 +80,13 @@ build-all: ## Build all compose files
 	@for f in $(COMPOSES); do \
 	  C=$$(basename $$f .yml); WS=workspaces/$${C}_ws docker compose -f $$f build || exit $$?; \
 	done
+
+mavros: up
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'export ROS_DOMAIN_ID=2; \
+	            source /opt/ros/humble/setup.bash; \
+	            ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:5762 fcu_protocol:=v2.0 timesync_rate:=0'
+
 
 up-all: ## Up all compose files (detached)
 	@for f in $(COMPOSES); do \

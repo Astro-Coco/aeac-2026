@@ -13,4 +13,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y \  
+    ros-${ROS_DISTRO}-mavros \  
+    && rm -rf /var/lib/apt/lists/*  
+  
+# Install GeographicLib datasets (required)  
+RUN apt-get update && apt-get install -y wget \  
+    && wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh \  
+    && chmod +x install_geographiclib_datasets.sh \  
+    && ./install_geographiclib_datasets.sh \  
+    && rm install_geographiclib_datasets.sh \  
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app

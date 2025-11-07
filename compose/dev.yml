@@ -6,8 +6,13 @@ services:
     container_name: aeac-${C}
     network_mode: host
     tty: true
+    ipc: host
+    privileged: true
     stdin_open: true
     volumes:
       - ..:/aeac
     working_dir: /aeac/workspaces    # set WS in .env, e.g. workspaces/small_ws
     command: ["bash","-lc","while :; do sleep 86400; done"]
+    environment:  
+      - ROS_DOMAIN_ID=2
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
