@@ -14,3 +14,7 @@
 	path = packages/bringup
 	url = https://github.com/Astro-Coco/bringup
 	branch = main
+[submodule "packages/vision"]
+	path = packages/vision
+	url = https://github.com/Astro-Coco/vision
+	branch = main
