@@ -16,4 +16,3 @@ RUN git clone --recurse-submodules https://github.com/mavlink-router/mavlink-rou
 
 # Install runtime deps (already covered by libstdc++ in base)
 WORKDIR /root
-CMD ["/bin/bash"]

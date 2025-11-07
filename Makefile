@@ -1,6 +1,6 @@
 # ===== Select compose (dev|payload|recon|water) =====
 C ?= dev
-
+DOMAIN ?= 2
 # ----- Paths / names -----
 COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
@@ -25,7 +25,7 @@ export UID GID
 ENV_INJECT := C=$(C) WS=$(WS_REL)
 
 # All compose files for the *-all targets
-COMPOSES := compose/dev.yml compose/payload.yml compose/recon.yml compose/water.yml
+COMPOSES := compose/dev.yml compose/payload.yml compose/recon.yml compose/water.yml compose/relay.yml
 
 # ===== Pretty help =====
 help: ## Show help
@@ -40,8 +40,9 @@ print-vars: ## Show resolved variables (debug)
 
 
 relay: ## Start SIYI relay (UDP 14540 → MAVROS, Pymavlink, Mission Planner)
-	docker compose -f compose/relay.yml up -d --build
-	@echo "🚀 SIYI relay running"
+	docker compose -f compose/relay.yml up -d --build && \
+	docker compose -f compose/relay.yml exec -it mavlink-router \
+	  sh -lc 'command -v bash >/dev/null && exec bash -i || exec sh -l'
 
 
 relay-down:
@@ -59,11 +60,11 @@ down: ## Down for C (remove orphans)
 	$(ENV_INJECT) docker compose -f $(COMPOSE_FILE) down --remove-orphans
 
 shell sh bash: ## Open bash in the running container (with ROS sourced)
-	docker exec -it $(CONTAINER) bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && exec bash -i"
+	docker exec -it $(CONTAINER) bash -lc "export ROS_DOMAIN_ID=$(DOMAIN) && source /opt/ros/humble/setup.bash && ros2 daemon start && exec bash -i"
 
 # ===== Workspace helpers =====
 link: 
-	docker exec -it $(CONTAINER) bash -lc 'mkdir -p "$(WS_IN)/src" && cd "$(REPO_IN)" && ./scripts/link_ws.sh "$(WS_REL)"'
+	docker exec -it $(CONTAINER) bash -lc 'cd "$(REPO_IN)" && ./scripts/link_ws.sh "$(WS_REL)"'
 
 
 launch: up
@@ -81,11 +82,9 @@ build-all: ## Build all compose files
 	  C=$$(basename $$f .yml); WS=workspaces/$${C}_ws docker compose -f $$f build || exit $$?; \
 	done
 
-mavros: up
+mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	  bash -lc 'export ROS_DOMAIN_ID=2; \
-	            source /opt/ros/humble/setup.bash; \
-	            ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:5762 fcu_protocol:=v2.0 timesync_rate:=0'
+	  bash -lc 'export ROS_DOMAIN_ID=$(DOMAIN) && source /opt/ros/humble/setup.bash && ros2 daemon start && ros2 launch mavros apm.launch fcu_url:=tcp://127.0.0.1:5762 fcu_protocol:=v2.0'
 
 
 up-all: ## Up all compose files (detached)
