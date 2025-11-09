@@ -6,6 +6,8 @@ TCP_PORT ?= 5762
 COMPOSE_FILE := compose/$(C).yml
 CONTAINER    ?= aeac-$(C)
 
+DRONE_IP ?= 192.168.0.13:7447
+
 # Workspace path RELATIVE to repo root (e.g., workspaces/dev_ws)
 WS_REL := workspaces/$(C)_ws
 
@@ -68,13 +70,19 @@ link:
 	docker exec -it $(CONTAINER) bash -lc 'cd "$(REPO_IN)" && ./scripts/link_ws.sh "$(WS_REL)"'
 
 
-#launch: up
-#	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-#	  bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & exec bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && bash"'
+connect: up    
+	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
+	  bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && \
+	  export RMW_IMPLEMENTATION=rmw_zenoh_cpp && \
+	  export ZENOH_CONFIG_OVERRIDE="mode=\"client\";connect/endpoints=[\"tcp/$(DRONE_IP)\"]" && \
+	  source /opt/ros/humble/setup.bash && ros2 daemon start && bash'
 
+
+	  
 launch: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
 	bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && exec bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && bash"'
+
 
 mavros-sim: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \

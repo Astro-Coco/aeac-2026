@@ -62,6 +62,8 @@ ajouter le package au pkgs.txt *attention de bien mettre le dernier new line
 echo "$RMW_IMPLEMENTATION"
 
 export ZENOH_ROUTER_CONFIG_URI=zenoh/config.json5
+export ZENOH_CONFIG_OVERRIDE='listen/endpoints=["tcp/DRONE_IP:7447"]'
+export ZENOH_CONFIG_OVERRIDE='listen/endpoints=["tcp/192.168.0.13:7447"]'
 
 mavlink-routerd -t 5764 -e 127.0.0.1:14554
 
