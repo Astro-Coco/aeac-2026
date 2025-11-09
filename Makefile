@@ -82,7 +82,7 @@ connect: up
 
 launch: up
 	WS=$(WS_IN) docker compose -f $(COMPOSE_FILE) exec -it $(C) \
-	bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && exec bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && bash"'
+	bash -lc 'source /opt/ros/humble/setup.bash && colcon build && source install/setup.bash && nohup ros2 run rmw_zenoh_cpp rmw_zenohd > /tmp/zenohd.log 2>&1 & exec bash -lc "source /opt/ros/humble/setup.bash && ros2 daemon start && bash"'
 
 
 mavros-sim: up
